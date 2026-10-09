@@ -69,7 +69,6 @@ private:
 	Image waveformImage;	
 	Image waveformImageWithBorder;
 	Path m_lastLinePath;
-	std::chrono::high_resolution_clock::time_point t1; //DEBUG
 
 	int myMSEGNo = -1;
 	int m_numIsOver = -1;
