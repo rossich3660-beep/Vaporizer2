@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Vaporizer2-VST3-Windows-x64
-          path: build/VASTvaporizer2_artefacts/Release/VST3/Vaporizer2.vst3
+          path: build/VASTvaporizer2_artefacts/Release/VST3/VASTvaporizer2.vst3
           if-no-files-found: error
           retention-days: 14
 
@@ -57,7 +57,7 @@ jobs:
         with:
           name: Vaporizer2-VST3-AU-macOS-universal
           path: |
-            build/VASTvaporizer2_artefacts/Release/VST3/Vaporizer2.vst3
-            build/VASTvaporizer2_artefacts/Release/AU/Vaporizer2.component
+            build/VASTvaporizer2_artefacts/Release/VST3/VASTvaporizer2.vst3
+            build/VASTvaporizer2_artefacts/Release/AU/VASTvaporizer2.component
           if-no-files-found: error
           retention-days: 14
