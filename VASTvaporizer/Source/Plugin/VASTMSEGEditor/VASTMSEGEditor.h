@@ -1,5 +1,6 @@
 /*
 VAST Dynamics
+Windows CI compatibility: remove unused debug timestamp member.
 */
 
 #ifndef VASTMSEGEDITOR_H_INCLUDED
