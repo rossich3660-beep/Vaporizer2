@@ -15,7 +15,7 @@ void GenreGridMidiAudioProcessor::prepareToPlay(double sampleRate, int)
 bool GenreGridMidiAudioProcessor::loadMidiFile(const juce::File& file)
 {
     juce::MidiFile midi;
-    if (!file.existsAsFile() || !file.hasFileExtension("mid;midi") || !file.loadFrom(file))
+    if (!file.existsAsFile() || !file.hasFileExtension("mid;midi") || !midi.readFrom(file.createInputStream().get()))
         return false;
 
     const int ticksPerQuarter = midi.getTimeFormat();
@@ -107,22 +107,11 @@ void GenreGridMidiAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
             {
                 const auto seed = (uint32_t) (loop * 7919 + (long long)(baseBeat * 997.0) + message.getNoteNumber() * 31);
                 juce::Random rng(seed);
-                if (amount > 0.01f && rng.nextFloat() < amount * 0.42f)
-                {
-                    const int shift = rng.nextBool() ? (rng.nextBool() ? 2 : 1) : (rng.nextBool() ? -2 : -1);
-                    message.setNoteNumber(juce::jlimit(0, 127, message.getNoteNumber() + (int) std::round(shift * amount)));
-                }
                 const int velocity = message.getVelocity();
                 const int variedVelocity = juce::jlimit(1, 127, velocity + (int) std::round((rng.nextFloat() * 2.0f - 1.0f) * 22.0f * amount));
                 message.setVelocity((juce::uint8) variedVelocity);
                 if (amount > 0.01f && rng.nextFloat() < amount * 0.25f)
                     targetBeat += (rng.nextFloat() - 0.5) * 0.08 * amount;
-            }
-            else if (message.isNoteOff())
-            {
-                // Keep note-offs aligned with their corresponding note-on to avoid hanging notes.
-                const double originalLoopBeat = baseBeat + (double) loop * length;
-                targetBeat = originalLoopBeat;
             }
 
             const int sample = juce::jlimit(0, juce::jmax(0, blockSamples - 1),
