@@ -1,0 +1,37 @@
+name: Build GenreGrid MIDI VST3
+
+on:
+  push:
+    branches: [ "genregrid-midi-vst3" ]
+    paths:
+      - "genregrid-vst3/**"
+      - ".github/workflows/genregrid-midi-vst3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+      - name: Configure
+        run: cmake -S genregrid-vst3 -B build-genregrid -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build VST3
+        run: cmake --build build-genregrid --config Release --target GenreGridMidi_VST3
+      - name: Package plugin
+        shell: pwsh
+        run: |
+          $plugin = Get-ChildItem -Path "build-genregrid" -Recurse -Directory -Filter "GenreGrid MIDI.vst3" | Select-Object -First 1
+          if (-not $plugin) { throw "VST3 bundle not found after build" }
+          Compress-Archive -Path $plugin.FullName -DestinationPath "GenreGrid-MIDI-VST3-Windows.zip" -Force
+      - name: Upload VST3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GenreGrid-MIDI-VST3-Windows
+          path: GenreGrid-MIDI-VST3-Windows.zip
+          if-no-files-found: error
