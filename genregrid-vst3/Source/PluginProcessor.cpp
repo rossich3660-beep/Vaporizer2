@@ -14,8 +14,14 @@ void GenreGridMidiAudioProcessor::prepareToPlay(double sampleRate, int)
 
 bool GenreGridMidiAudioProcessor::loadMidiFile(const juce::File& file)
 {
+    if (!file.existsAsFile() || !file.hasFileExtension("mid;midi"))
+        return false;
+    auto input = file.createInputStream();
+    if (input == nullptr)
+        return false;
+
     juce::MidiFile midi;
-    if (!file.existsAsFile() || !file.hasFileExtension("mid;midi") || !midi.readFrom(file.createInputStream().get()))
+    if (!midi.readFrom(*input))
         return false;
 
     const int ticksPerQuarter = midi.getTimeFormat();
@@ -109,7 +115,7 @@ void GenreGridMidiAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
                 juce::Random rng(seed);
                 const int velocity = message.getVelocity();
                 const int variedVelocity = juce::jlimit(1, 127, velocity + (int) std::round((rng.nextFloat() * 2.0f - 1.0f) * 22.0f * amount));
-                message.setVelocity((juce::uint8) variedVelocity);
+                message.setVelocity(variedVelocity);
                 if (amount > 0.01f && rng.nextFloat() < amount * 0.25f)
                     targetBeat += (rng.nextFloat() - 0.5) * 0.08 * amount;
             }
